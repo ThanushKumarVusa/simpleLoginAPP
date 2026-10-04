@@ -1,0 +1,48 @@
+services:
+  application:
+    build:
+      context : ./app
+    container_name: login-app
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: backend
+      DB_PORT: 3306
+      DB_NAME: login_app
+      DB_USER: login_user
+      DB_PASSWORD: loginpassword
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+
+
+
+  backend:
+    container_name: login-db
+    build :
+      context : ./db
+    environment:
+      MYSQL_ROOT_PASSWORD : rootpassword
+      MYSQL_DATABASE: login_app
+      MYSQL_USER : login_user
+      MYSQL_PASSWORD: loginpassword
+
+    ports :
+      - "3305:3306"
+    
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  
+volumes:
+  mysql_data:
+
+
+    
